@@ -1,5 +1,5 @@
 ## Assisting Visually Impaired Individuals
-### University Project for AOOP @ IPVC
+### University Project for AOOP @ [IPVC-ESTG](https://www.ipvc.pt/estg/)
 
 #### Problem: Helping visually impaired individuals navigate safely
 
