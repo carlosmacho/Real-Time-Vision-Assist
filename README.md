@@ -7,10 +7,10 @@
 
 #### Implementation Steps:
 
-- **Data Collection:** Gather images of common obstacles and important objects (e.g., doors, stairs, etc.).
-- **Model Training:** Train a YOLO model to detect these obstacles and objects.
-- **Real-Time Detection:** Use a portable camera system to provide real-time detection.
-- **Guidance System:** Develop an audio or haptic feedback system to inform users about detected objects and obstacles.
+1. **Data Collection:** Gather images of common obstacles and important objects (e.g., doors, stairs, etc.).
+2. **Model Training:** Train a YOLO model to detect these obstacles and objects.
+3. **Real-Time Detection:** Use a portable camera system to provide real-time detection.
+4. **Guidance System:** Develop an audio or haptic feedback system to inform users about detected objects and obstacles.
 
 #### Tools:
 
