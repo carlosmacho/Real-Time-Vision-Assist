@@ -22,14 +22,6 @@ if not cap.isOpened():
     print("Error: Could not open webcam.")
     exit()
 
-# Desired input size for the YOLO model
-input_size = 640  # Adjust as needed to match the model's expected input size
-
-# Parameters for NMS and IoU
-conf_threshold = 0.5  # Example confidence threshold
-iou_threshold = 0.7   # Example IoU threshold
-agnostic_nms = True   # Perform NMS independently of class
-
 while True:
     ret, frame = cap.read()
 
@@ -38,7 +30,7 @@ while True:
         break
 
     # Resize the frame to the model's input size
-    frame_resized = cv2.resize(frame, (input_size, input_size))
+    frame_resized = cv2.resize(frame, (640, 640))
 
     # Convert frame to RGB and normalize it
     frame_rgb = cv2.cvtColor(frame_resized, cv2.COLOR_BGR2RGB)
@@ -52,7 +44,7 @@ while True:
 
     # Perform object detection using YOLOv10 with NMS and IoU settings
     with torch.no_grad():  # Disable gradient calculation for inference
-        results = model.predict(frame_tensor, imgsz=input_size, conf=conf_threshold, iou=iou_threshold, agnostic_nms=agnostic_nms)
+        results = model.predict(frame_tensor, imgsz=640, conf=0.5, iou=0.3, agnostic_nms=False)
 
     # Extract predictions from the model output
     if isinstance(results, list):
@@ -65,7 +57,7 @@ while True:
         continue
 
     # Convert predictions to supervisely format
-    detections = sv.Detections.from_ultralytics(predictions)
+    detections = sv.Detections.from_ultralytics(predictions) #.with_nms(threshold=0.7, class_agnostic=False)
 
     # Annotate the frame with bounding boxes and labels
     annotated_image = bounding_box_annotator.annotate(scene=frame_resized, detections=detections)

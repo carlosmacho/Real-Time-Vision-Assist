@@ -1,3 +1,10 @@
 {
-  "cSpell.words": ["supervisely", "ultralytics", "unsqueeze", "YOLO", "yolov"]
+  "cSpell.words": [
+    "imgsz",
+    "supervisely",
+    "ultralytics",
+    "unsqueeze",
+    "YOLO",
+    "yolov"
+  ]
 }
