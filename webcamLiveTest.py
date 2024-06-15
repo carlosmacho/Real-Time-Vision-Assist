@@ -1,10 +1,10 @@
 import cv2
 import torch
 import supervision as sv
-from ultralytics import YOLOv10
+from ultralytics import YOLO
 
 # Load the YOLOv10 model
-model = YOLOv10('yolov8n.pt')
+model = YOLO('yolov8n.pt')
 
 # Check CUDA availability and move model to GPU if available
 device = 'cuda' if torch.cuda.is_available() else 'cpu'

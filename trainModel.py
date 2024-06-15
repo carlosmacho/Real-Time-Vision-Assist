@@ -1,8 +1,5 @@
 import os
 import subprocess
-import cv2
-import supervision as sv
-from ultralytics import YOLOv10
 from roboflow import Roboflow
 from IPython.display import Image, display
 import requests
