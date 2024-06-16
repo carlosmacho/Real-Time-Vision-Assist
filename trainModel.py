@@ -119,7 +119,7 @@ def train_yolo():
             'task=detect',
             'mode=train',
             'epochs=100',
-            'patience=50'
+            'patience=50',
             'batch=8',
             'plots=True',
             f'model={yolo_model_path}',
