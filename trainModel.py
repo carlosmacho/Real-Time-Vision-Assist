@@ -99,7 +99,7 @@ def download_dataset():
     try:
         # Initialize Roboflow with the API key
         ROBOFLOW_API_KEY = os.getenv('ROBOFLOW_API_KEY')
-        rf = Roboflow(api_key="JaM7HVDRmrbbCNrYVam0")
+        rf = Roboflow(api_key="ROBOFLOW_API_KEY")
 
         # Access the specific project and version
         project = rf.workspace("my-workspace-zdfxw").project("yolo-real-time-object-detection")
