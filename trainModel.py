@@ -4,7 +4,10 @@ from roboflow import Roboflow
 from IPython.display import Image, display
 import requests
 import torch
+from dotenv import load_dotenv
 
+# Take environment variables from .env
+load_dotenv()
 
 # Get the current working directory
 HOME = os.getcwd()
@@ -95,11 +98,12 @@ def download_weights():
 def download_dataset():
     try:
         # Initialize Roboflow with the API key
+        ROBOFLOW_API_KEY = os.getenv('ROBOFLOW_API_KEY')
         rf = Roboflow(api_key="JaM7HVDRmrbbCNrYVam0")
 
         # Access the specific project and version
         project = rf.workspace("my-workspace-zdfxw").project("yolo-real-time-object-detection")
-        version = project.version(3)
+        version = project.version(4)
         
         # Download the dataset
         dataset = version.download("yolov8")
@@ -125,14 +129,15 @@ def train_yolo():
         
         # Define the path to the YOLO model and dataset location
         yolo_model_path = os.path.join(HOME, "weights", "yolov8n.pt")
-        dataset_location = "C:\\Users\\Carlos\\vsProjects\\CP3\\Yolo-Real-Time-Object-Detection-2" # Update this with the actual dataset location
+        dataset_location = "C:\\Users\\Carlos\\vsProjects\\CP3\\Yolo-Real-Time-Object-Detection-4" # Update this with the actual dataset location
 
         # Run the YOLO training command
         command = [
             'yolo',
             'task=detect',
             'mode=train',
-            'epochs=50',
+            'epochs=100',
+            'patience=50'
             'batch=8',
             'plots=True',
             f'model={yolo_model_path}',
