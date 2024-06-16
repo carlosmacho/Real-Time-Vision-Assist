@@ -71,12 +71,11 @@ def download_weights():
 
         # URLs of the weights files
         urls = [
-            "https://github.com/jameslahm/yolov10/releases/download/v1.0/yolov10n.pt",
-            "https://github.com/jameslahm/yolov10/releases/download/v1.0/yolov10s.pt",
-            "https://github.com/jameslahm/yolov10/releases/download/v1.0/yolov10m.pt",
-            "https://github.com/jameslahm/yolov10/releases/download/v1.0/yolov10b.pt",
-            "https://github.com/jameslahm/yolov10/releases/download/v1.0/yolov10x.pt",
-            "https://github.com/jameslahm/yolov10/releases/download/v1.0/yolov10l.pt",
+            "https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8n.pt",
+            "https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8s.pt",
+            "https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8m.pt",
+            "https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8l.pt",
+            "https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8x.pt",
         ]
 
         # Download the files
@@ -97,10 +96,10 @@ def download_dataset():
     try:
         # Initialize Roboflow with the API key
         rf = Roboflow(api_key="JaM7HVDRmrbbCNrYVam0")
-        
+
         # Access the specific project and version
-        project = rf.workspace("fyp-sibxz").project("yolov8_door")
-        version = project.version(1)
+        project = rf.workspace("my-workspace-zdfxw").project("yolo-real-time-object-detection")
+        version = project.version(3)
         
         # Download the dataset
         dataset = version.download("yolov8")
@@ -125,19 +124,20 @@ def train_yolo():
         os.chdir(HOME)
         
         # Define the path to the YOLO model and dataset location
-        yolo_model_path = os.path.join(HOME, "weights", "yolov10n.pt")
-        dataset_location = "C:\\Users\\Carlos\\CP3\\YOLOv8_Door-1" # Update this with the actual dataset location
+        yolo_model_path = os.path.join(HOME, "weights", "yolov8n.pt")
+        dataset_location = "C:\\Users\\Carlos\\vsProjects\\CP3\\Yolo-Real-Time-Object-Detection-2" # Update this with the actual dataset location
 
         # Run the YOLO training command
         command = [
             'yolo',
             'task=detect',
             'mode=train',
-            'epochs=25',
+            'epochs=50',
             'batch=8',
             'plots=True',
             f'model={yolo_model_path}',
-            f'data={dataset_location}/data.yaml',
+            f'data={dataset_location}\data.yaml',
+            'imgsz=640',
             'device=cuda' # Explicitly specify GPU usage if available
         ]
         subprocess.run(command, check=True)
@@ -154,7 +154,7 @@ def list_directory():
         HOME = os.getcwd()
 
         # Define the path to the directory you want to list
-        directory_path = os.path.join(HOME, "runs", "detect", "train3")
+        directory_path = os.path.join(HOME, "runs", "detect", "train10")
 
         # List the contents of the directory
         if os.path.exists(directory_path):
@@ -179,7 +179,7 @@ def display_confusion_matrix():
         os.chdir(HOME)
         
         # Define the path to the confusion matrix image
-        image_path = os.path.join(HOME, "runs", "detect", "train3", "confusion_matrix.png")
+        image_path = os.path.join(HOME, "runs", "detect", "train10", "confusion_matrix.png")
         
         # Display the image
         display(Image(filename=image_path, width=600))
@@ -199,7 +199,7 @@ def display_results_image():
         os.chdir(HOME)
         
         # Define the path to the results image
-        image_path = os.path.join(HOME, "runs", "detect","train3", "results.png")
+        image_path = os.path.join(HOME, "runs", "detect","train10", "results.png")
         
         # Display the image
         display(Image(filename=image_path, width=600))

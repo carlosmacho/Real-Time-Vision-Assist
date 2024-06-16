@@ -1,10 +1,13 @@
+import subprocess
+import threading
 import cv2
+import numpy as np
 import torch
 import supervision as sv
 from ultralytics import YOLO
 
 # Load the YOLOv10 model
-model = YOLO('yolov8n.pt')
+model = YOLO('C:\Users\Carlos\vsProjects\CP3\runs\detect\train10\weights\best.pt')
 
 # Check CUDA availability and move model to GPU if available
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -17,6 +20,20 @@ label_annotator = sv.LabelAnnotator()
 
 # Open the webcam
 cap = cv2.VideoCapture(0)
+
+prev_predictions = set()
+
+LABELS = [
+    'person',
+]
+
+def prediction_add_diff(curr_predictions, prev_prediction):
+    return [curr_predict for curr_predict in curr_predictions if curr_predict not in prev_prediction]
+
+
+def say_predictions(predict_diff):
+    for new_predict in predict_diff:
+        subprocess.call(["say", new_predict])
 
 if not cap.isOpened():
     print("Error: Could not open webcam.")
@@ -38,7 +55,7 @@ while True:
 
     # Transpose and add batch dimension
     frame_tensor = torch.from_numpy(frame_normalized).permute(2, 0, 1).unsqueeze(0).float()
-    
+
     # Move frame to the correct device
     frame_tensor = frame_tensor.to(device)
 
@@ -57,7 +74,29 @@ while True:
         continue
 
     # Convert predictions to supervisely format
-    detections = sv.Detections.from_ultralytics(predictions) #.with_nms(threshold=0.7, class_agnostic=False)
+    detections = sv.Detections.from_ultralytics(predictions)  # .with_nms(threshold=0.7, class_agnostic=False)
+
+    # FILTER BY LABELS // UNCOMMENT TO ENABLE FOR SPECIFIC LABELS
+    #detections = detections[np.isin(detections.data['class_name'], LABELS,)]
+
+    curr_predictions = set(detections.data['class_name'])
+    print(curr_predictions)
+
+    if curr_predictions != prev_predictions:
+        predict_diff = prediction_add_diff(curr_predictions, prev_predictions)
+
+        # FILTER BY LABELS // UNCOMMENT TO ENABLE FOR SPECIFIC LABELS
+        # predict_diff = [predict for predict in predict_diff if predict in LABELS]
+
+        threading.Thread(target=say_predictions, args=(predict_diff,)).start()
+
+    prev_predictions = curr_predictions
+    # if set(detections_class_names) != already_detected:
+    #
+    #
+    # if len(detection_name) > 0 and detection_name[0] not in already_detected:
+    #    already_detected.add(detection_name[0])
+    #    subprocess.call(["say", detection_name[0]])
 
     # Annotate the frame with bounding boxes and labels
     annotated_image = bounding_box_annotator.annotate(scene=frame_resized, detections=detections)
