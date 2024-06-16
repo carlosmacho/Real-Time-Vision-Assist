@@ -14,7 +14,7 @@
 
 #### Tools:
 
-- **YOLO:** For real-time object detection.
+- **YOLOv8:** For real-time object detection.
 - **OpenCV:** For video capture and processing.
-- **Pyttsx3 or gTTS:** For text-to-speech conversion to provide audio feedback.
+- **gTTS:** For text-to-speech conversion to provide audio feedback.
 - **Python:** For scripting and integrating the components.
