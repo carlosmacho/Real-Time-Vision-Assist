@@ -7,7 +7,7 @@ import supervision as sv
 from ultralytics import YOLO
 
 # Load the YOLOv10 model
-model = YOLO('C:\Users\Carlos\vsProjects\CP3\runs\detect\train10\weights\best.pt')
+model = YOLO('C:\Users\Carlos\vsProjects\CP3\runs\detect\train12\weights\best.pt')
 
 # Check CUDA availability and move model to GPU if available
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
