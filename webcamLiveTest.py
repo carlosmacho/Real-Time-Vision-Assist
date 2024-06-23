@@ -1,3 +1,5 @@
+import threading
+
 import cv2
 import torch
 import supervision as sv
@@ -8,8 +10,11 @@ from src.utils.get_position import get_position
 from src.utils.prediction_diff import prediction_add_diff
 from src.utils.say_predictions import say_predictions
 
+voice_lock = threading.Lock()
+prev_predictions = set()
+
 # Load the YOLOv10 model
-model = YOLO('C:\Users\Carlos\vsProjects\CP3\runs\detect\train12\weights\best.pt')
+model = YOLO('yolov8n.pt')
 
 # Check CUDA availability and move model to GPU if available
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -21,7 +26,7 @@ bounding_box_annotator = sv.BoundingBoxAnnotator()
 label_annotator = sv.LabelAnnotator()
 
 # Open the webcam
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 if not cap.isOpened():
     print("Error: Could not open webcam.")
