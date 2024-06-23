@@ -1,10 +1,8 @@
-import threading
-
 import cv2
 import torch
+import threading
 import supervision as sv
 from ultralytics import YOLO
-
 from src.dto.prediction import Prediction
 from src.utils.get_position import get_position
 from src.utils.prediction_diff import prediction_add_diff
@@ -44,9 +42,9 @@ while True:
     # Resize the frame to the model's input size
     FRAME_SIZE = (640, 640)
     frame_resized = cv2.resize(frame, FRAME_SIZE)
-
-    left_limit = FRAME_SIZE[0] / 3 # Left limit of the center area (1/3 of the frame width)
-    center_limit = left_limit * 2 # Right limit of the center area (2/3 of the frame width)
+    
+    LEFT_LIMIT = FRAME_SIZE[0] / 3 # Left limit of the center area (1/3 of the frame width)
+    CENTER_LIMIT = LEFT_LIMIT * 2  # Right limit of the center area (2/3 of the frame width)
 
     # Convert frame to RGB and normalize it
     frame_rgb = cv2.cvtColor(frame_resized, cv2.COLOR_BGR2RGB)
@@ -80,7 +78,7 @@ while True:
     for i in range(len(detections)):
         class_id = detections.data['class_name'][i] # Get class ID of the object in the frame (e.g. 'person', 'car', 'truck', etc.) from the detections data
         position_xy = detections.xyxy[i] # Get the bounding box of the object in the frame (x1, y1, x2, y2) from the detections data
-        position = get_position(position_xy[0], position_xy[2], left_limit, center_limit) # Get position of the object in the frame (left, center, right) based on its bounding box
+        position = get_position(position_xy[0], position_xy[2], LEFT_LIMIT, CENTER_LIMIT) # Get position of the object in the frame (left, center, right) based on its bounding box
 
         curr_predictions.add(Prediction(class_id, position))
 
