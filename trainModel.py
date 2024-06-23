@@ -124,7 +124,7 @@ def train_yolo():
             'batch=8',
             'plots=True',
             f'model={yolo_model_path}',
-            f'data={dataset_location}\data.yaml',
+            f'data={dataset_location}/data.yaml',
             'imgsz=640',
             'device=cuda' # Explicitly specify GPU usage if available
         ]
