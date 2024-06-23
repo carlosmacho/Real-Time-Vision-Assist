@@ -10,10 +10,11 @@ from src.utils.get_position import get_position
 from src.utils.prediction_diff import prediction_add_diff
 from src.utils.say_predictions import say_predictions
 
+# Initialize voice lock and previous predictions
 voice_lock = threading.Lock()
 prev_predictions = set()
 
-# Load the YOLOv10 model
+# Load the YOLO model
 model = YOLO('yolov8n.pt')
 
 # Check CUDA availability and move model to GPU if available
@@ -28,12 +29,13 @@ label_annotator = sv.LabelAnnotator()
 # Open the webcam
 cap = cv2.VideoCapture(1)
 
+# Check if the webcam was opened successfully
 if not cap.isOpened():
     print("Error: Could not open webcam.")
     exit()
 
 while True:
-    ret, frame = cap.read()
+    ret, frame = cap.read() # Read a frame from the webcam
 
     if not ret:
         print("Error: Could not read frame.")
@@ -43,8 +45,8 @@ while True:
     FRAME_SIZE = (640, 640)
     frame_resized = cv2.resize(frame, FRAME_SIZE)
 
-    left_limit = FRAME_SIZE[0] / 3
-    center_limit = left_limit * 2
+    left_limit = FRAME_SIZE[0] / 3 # Left limit of the center area (1/3 of the frame width)
+    center_limit = left_limit * 2 # Right limit of the center area (2/3 of the frame width)
 
     # Convert frame to RGB and normalize it
     frame_rgb = cv2.cvtColor(frame_resized, cv2.COLOR_BGR2RGB)
@@ -56,7 +58,7 @@ while True:
     # Move frame to the correct device
     frame_tensor = frame_tensor.to(device)
 
-    # Perform object detection using YOLOv10 with NMS and IoU settings
+    # Perform object detection using YOLOv8 with NMS and IoU settings
     with torch.no_grad():  # Disable gradient calculation for inference
         results = model.predict(frame_tensor, imgsz=640, conf=0.5, iou=0.3, agnostic_nms=False)
 
@@ -73,20 +75,21 @@ while True:
     # Convert predictions to supervisely format
     detections = sv.Detections.from_ultralytics(predictions)  # .with_nms(threshold=0.7, class_agnostic=False)
 
+    # Get current predictions and store them in a set for comparison with previous predictions later on in the loop iteration
     curr_predictions = set()
     for i in range(len(detections)):
-        class_id = detections.data['class_name'][i]
-        position_xy = detections.xyxy[i]
-        position = get_position(position_xy[0], position_xy[2], left_limit, center_limit)
+        class_id = detections.data['class_name'][i] # Get class ID of the object in the frame (e.g. 'person', 'car', 'truck', etc.) from the detections data
+        position_xy = detections.xyxy[i] # Get the bounding box of the object in the frame (x1, y1, x2, y2) from the detections data
+        position = get_position(position_xy[0], position_xy[2], left_limit, center_limit) # Get position of the object in the frame (left, center, right) based on its bounding box
 
         curr_predictions.add(Prediction(class_id, position))
 
-    # store sentances already said
+    # Check for differences in predictions and say them and store sentences already said
     predict_diff = prediction_add_diff(curr_predictions, list(prev_predictions))
     if len(predict_diff) > 0 and not voice_lock.locked():
         print("Predict diff", predict_diff)
         curr_voice_thread = threading.Thread(target=say_predictions,
-                                             args=(voice_lock, [str(prediction) for prediction in predict_diff],))
+                                             args=(voice_lock, [str(prediction) for prediction in predict_diff],)) # Create a new thread to say the predictions
         curr_voice_thread.start()
 
     print(curr_predictions, prev_predictions)
