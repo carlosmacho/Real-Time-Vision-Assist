@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-
 from src.dto.position import Position
 
 
