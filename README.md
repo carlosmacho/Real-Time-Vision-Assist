@@ -1,9 +1,12 @@
-## Assisting Visually Impaired Individuals
+# Assisting Visually Impaired Individuals
 ### University Project for AOOP @ [IPVC-ESTG](https://www.ipvc.pt/estg/)
 
 #### Problem: Helping visually impaired individuals navigate safely
 
 #### Description: We will Utilize YOLO to detect obstacles and important objects to assist visually impaired individuals in navigating their environment.
+
+## High Level Overview
+![high_level_overview](https://github.com/carlosmacho/AOOP-CP3/assets/61155153/71c66383-5273-4247-9902-ca1303417aa3)
 
 #### Implementation Steps:
 
