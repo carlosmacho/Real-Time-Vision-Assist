@@ -6,8 +6,7 @@
 #### Description: We will Utilize YOLO to detect obstacles and important objects to assist visually impaired individuals in navigating their environment.
 
 ## High Level Overview
-![high_level_overview]([https://github.com/carlosmacho/AOOP-CP3/assets/61155153/71c66383-5273-4247-9902-ca1303417aa3](https://github.com/carlosmacho/AOOP-CP3/blob/master/high_level_overview.png))
-
+![high_level_overview.png](https://github.com/carlosmacho/AOOP-CP3/blob/master/high_level_overview.png)
 #### Implementation Steps:
 
 1. **Data Collection:** Gather images of common obstacles and important objects (e.g., doors, stairs, etc.).
