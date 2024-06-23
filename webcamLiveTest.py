@@ -1,10 +1,12 @@
-import subprocess
-import threading
 import cv2
-import numpy as np
 import torch
 import supervision as sv
 from ultralytics import YOLO
+
+from src.dto.prediction import Prediction
+from src.utils.get_position import get_position
+from src.utils.prediction_diff import prediction_add_diff
+from src.utils.say_predictions import say_predictions
 
 # Load the YOLOv10 model
 model = YOLO('C:\Users\Carlos\vsProjects\CP3\runs\detect\train12\weights\best.pt')
@@ -21,20 +23,6 @@ label_annotator = sv.LabelAnnotator()
 # Open the webcam
 cap = cv2.VideoCapture(0)
 
-prev_predictions = set()
-
-LABELS = [
-    'person',
-]
-
-def prediction_add_diff(curr_predictions, prev_prediction):
-    return [curr_predict for curr_predict in curr_predictions if curr_predict not in prev_prediction]
-
-
-def say_predictions(predict_diff):
-    for new_predict in predict_diff:
-        subprocess.call(["say", new_predict])
-
 if not cap.isOpened():
     print("Error: Could not open webcam.")
     exit()
@@ -47,7 +35,11 @@ while True:
         break
 
     # Resize the frame to the model's input size
-    frame_resized = cv2.resize(frame, (640, 640))
+    FRAME_SIZE = (640, 640)
+    frame_resized = cv2.resize(frame, FRAME_SIZE)
+
+    left_limit = FRAME_SIZE[0] / 3
+    center_limit = left_limit * 2
 
     # Convert frame to RGB and normalize it
     frame_rgb = cv2.cvtColor(frame_resized, cv2.COLOR_BGR2RGB)
@@ -55,7 +47,7 @@ while True:
 
     # Transpose and add batch dimension
     frame_tensor = torch.from_numpy(frame_normalized).permute(2, 0, 1).unsqueeze(0).float()
-
+    
     # Move frame to the correct device
     frame_tensor = frame_tensor.to(device)
 
@@ -76,27 +68,24 @@ while True:
     # Convert predictions to supervisely format
     detections = sv.Detections.from_ultralytics(predictions)  # .with_nms(threshold=0.7, class_agnostic=False)
 
-    # FILTER BY LABELS // UNCOMMENT TO ENABLE FOR SPECIFIC LABELS
-    #detections = detections[np.isin(detections.data['class_name'], LABELS,)]
+    curr_predictions = set()
+    for i in range(len(detections)):
+        class_id = detections.data['class_name'][i]
+        position_xy = detections.xyxy[i]
+        position = get_position(position_xy[0], position_xy[2], left_limit, center_limit)
 
-    curr_predictions = set(detections.data['class_name'])
-    print(curr_predictions)
+        curr_predictions.add(Prediction(class_id, position))
 
-    if curr_predictions != prev_predictions:
-        predict_diff = prediction_add_diff(curr_predictions, prev_predictions)
+    # store sentances already said
+    predict_diff = prediction_add_diff(curr_predictions, list(prev_predictions))
+    if len(predict_diff) > 0 and not voice_lock.locked():
+        print("Predict diff", predict_diff)
+        curr_voice_thread = threading.Thread(target=say_predictions,
+                                             args=(voice_lock, [str(prediction) for prediction in predict_diff],))
+        curr_voice_thread.start()
 
-        # FILTER BY LABELS // UNCOMMENT TO ENABLE FOR SPECIFIC LABELS
-        # predict_diff = [predict for predict in predict_diff if predict in LABELS]
-
-        threading.Thread(target=say_predictions, args=(predict_diff,)).start()
-
+    print(curr_predictions, prev_predictions)
     prev_predictions = curr_predictions
-    # if set(detections_class_names) != already_detected:
-    #
-    #
-    # if len(detection_name) > 0 and detection_name[0] not in already_detected:
-    #    already_detected.add(detection_name[0])
-    #    subprocess.call(["say", detection_name[0]])
 
     # Annotate the frame with bounding boxes and labels
     annotated_image = bounding_box_annotator.annotate(scene=frame_resized, detections=detections)
