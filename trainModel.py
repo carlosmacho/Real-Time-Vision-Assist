@@ -85,7 +85,7 @@ def download_dataset():
 
         # Access the specific project and version
         project = rf.workspace("my-workspace-zdfxw").project("yolo-real-time-object-detection")
-        version = project.version(4)
+        version = project.version(5)
         
         # Download the dataset
         dataset = version.download("yolov8")
@@ -110,16 +110,17 @@ def train_yolo():
         os.chdir(HOME)
         
         # Define the path to the YOLO model and dataset location
-        yolo_model_path = os.path.join(HOME, "weights", "yolov8m.pt")
-        dataset_location = "C:\\Users\\Carlos\\vsProjects\\AOOP-CP3\\Yolo-Real-Time-Object-Detection-4" # Update this with the actual dataset location
+        yolo_model_path = os.path.join(HOME, "weights", "yolov8n.pt")
+        dataset_location = "C:\\Users\\Carlos\\vsProjects\\AOOP-CP3\\Yolo-Real-Time-Object-Detection-5" # Update this with the actual dataset location
+        #dataset_location = os.path.join(HOME, "datasets") # Update this with the actual dataset location
 
         # Run the YOLO training command
         command = [
             'yolo',
             'task=detect',
             'mode=train',
-            'epochs=100',
-            'patience=50',
+            'epochs=300',
+            'patience=100',
             'batch=8',
             'plots=True',
             f'model={yolo_model_path}',
