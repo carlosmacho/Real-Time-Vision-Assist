@@ -25,7 +25,7 @@ bounding_box_annotator = sv.BoundingBoxAnnotator()
 label_annotator = sv.LabelAnnotator()
 
 # Open the webcam
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 
 # Check if the webcam was opened successfully
 if not cap.isOpened():
@@ -33,7 +33,7 @@ if not cap.isOpened():
     exit()
 
 while True:
-    ret, frame = cap.read() # Read a frame from the webcam
+    ret, frame = cap.read()  # Read a frame from the webcam
 
     if not ret:
         print("Error: Could not read frame.")
@@ -42,8 +42,8 @@ while True:
     # Resize the frame to the model's input size
     FRAME_SIZE = (640, 640)
     frame_resized = cv2.resize(frame, FRAME_SIZE)
-    
-    LEFT_LIMIT = FRAME_SIZE[0] / 3 # Left limit of the center area (1/3 of the frame width)
+
+    LEFT_LIMIT = FRAME_SIZE[0] / 3  # Left limit of the center area (1/3 of the frame width)
     CENTER_LIMIT = LEFT_LIMIT * 2  # Right limit of the center area (2/3 of the frame width)
 
     # Convert frame to RGB and normalize it
@@ -52,7 +52,7 @@ while True:
 
     # Transpose and add batch dimension
     frame_tensor = torch.from_numpy(frame_normalized).permute(2, 0, 1).unsqueeze(0).float()
-    
+
     # Move frame to the correct device
     frame_tensor = frame_tensor.to(device)
 
@@ -76,9 +76,12 @@ while True:
     # Get current predictions and store them in a set for comparison with previous predictions later on in the loop iteration
     curr_predictions = set()
     for i in range(len(detections)):
-        class_id = detections.data['class_name'][i] # Get class ID of the object in the frame (e.g. 'person', 'car', 'truck', etc.) from the detections data
-        position_xy = detections.xyxy[i] # Get the bounding box of the object in the frame (x1, y1, x2, y2) from the detections data
-        position = get_position(position_xy[0], position_xy[2], LEFT_LIMIT, CENTER_LIMIT) # Get position of the object in the frame (left, center, right) based on its bounding box
+        class_id = detections.data['class_name'][
+            i]  # Get class ID of the object in the frame (e.g. 'person', 'car', 'truck', etc.) from the detections data
+        position_xy = detections.xyxy[
+            i]  # Get the bounding box of the object in the frame (x1, y1, x2, y2) from the detections data
+        position = get_position(position_xy[0], position_xy[2], LEFT_LIMIT,
+                                CENTER_LIMIT)  # Get position of the object in the frame (left, center, right) based on its bounding box
 
         curr_predictions.add(Prediction(class_id, position))
 
@@ -87,7 +90,8 @@ while True:
     if len(predict_diff) > 0 and not voice_lock.locked():
         print("Predict diff", predict_diff)
         curr_voice_thread = threading.Thread(target=say_predictions,
-                                             args=(voice_lock, [str(prediction) for prediction in predict_diff],)) # Create a new thread to say the predictions
+                                             args=(voice_lock, [str(prediction) for prediction in
+                                                                predict_diff],))  # Create a new thread to say the predictions
         curr_voice_thread.start()
 
     print(curr_predictions, prev_predictions)
