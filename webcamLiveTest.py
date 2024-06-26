@@ -13,7 +13,7 @@ voice_lock = threading.Lock()
 prev_predictions = set()
 
 # Load the YOLO model
-model = YOLO('yolov8n.pt')
+model = YOLO('best.pt')
 
 # Check CUDA availability and move model to GPU if available
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -25,7 +25,7 @@ bounding_box_annotator = sv.BoundingBoxAnnotator()
 label_annotator = sv.LabelAnnotator()
 
 # Open the webcam
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 # Check if the webcam was opened successfully
 if not cap.isOpened():
